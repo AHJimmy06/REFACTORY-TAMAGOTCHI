@@ -74,7 +74,6 @@ function create() {
   });
 
   const playButton = createButton("Jugar", () => {
-    this.cat.anims.play("cat-idle", false);
     if (!this.cat.anims.isPlaying && this.energyBar.value >= 10) {
       this.cat.anims.play("cat-play", true);
       updateBar(this.energyBar, -10);
