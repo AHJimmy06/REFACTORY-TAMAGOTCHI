@@ -2,8 +2,8 @@ import { createAnimations } from "./animations.js";
 
 const config = {
   type: Phaser.AUTO, // webgl, canvas
-  width: 720,
-  height: 440,
+  width: 580,
+  height: 300,
   backgroundColor: "#049cd8",
   parent: "game",
   scene: {
@@ -11,11 +11,16 @@ const config = {
     create: create, // se ejecuta cuando el juego comienza
     update: update, // se ejecuta en cada frame
   },
+  //pixel art on para que se vea mejor al renderizar
+  pixelArt: true,
 };
 
 new Phaser.Game(config);
 
 function preload() {
+  //bg
+  this.load.image("background","assets/enviroment/ExampleRoom 2.png")
+  
   this.load.image("cloud1", "assets/enviroment/cloud1.png");
   this.load.spritesheet("cat", "assets/personaje/Eating.png", {
     frameWidth: 32,
@@ -45,9 +50,11 @@ function preload() {
 }
 
 function create() {
-  this.add.image(350, 100, "cloud1").setOrigin(0, 0).setScale(0.2);
+  this.add.image(0,-100,"background").setOrigin(0,0).setScale(1);
 
-  this.cat = this.add.sprite(480, 32, "catIdle").setOrigin(0, 0).setScale(4);
+  this.add.image(350, 50, "cloud1").setOrigin(0, 0).setScale(0.2);
+
+  this.cat = this.add.sprite(400, 100, "catIdle").setOrigin(0, 0).setScale(4);
 
   createAnimations(this);
 
