@@ -96,21 +96,25 @@ export class Game extends Scene {
 
     handleEat() {
         console.log("handleEat");
+        this.cat.setPosition(300, 550);
         this.cat.anims.play("cat-eat", true);
     }
 
     handleSleep() {
         console.log("handleSleep");
+        this.cat.setPosition(460, 270);
         this.cat.anims.play("cat-sleep", true);
     }
 
     handlePlay() {
         console.log("handlePlay");
+        this.cat.setPosition(780, 290);
         this.cat.anims.play("cat-play", true);
     }
 
     handlePoop() {
         console.log("handlePoop");
+        this.cat.setPosition(700, 500);
         this.cat.anims.play("cat-pooping", true);
     }
 }
