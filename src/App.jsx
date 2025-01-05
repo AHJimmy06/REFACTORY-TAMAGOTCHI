@@ -24,10 +24,6 @@ function App() {
             setEnergy((prev) => Math.max(0, prev - 10)); // Reducir energía
             setHappiness((prev) => Math.max(0, prev - 10)); // Reducir felicidad
         }, 1000); // Cada segundo
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/TamagotchiJavier
         if (health === 0) {
             const game = phaserRef.current.game;
             if (game) {
@@ -35,10 +31,6 @@ function App() {
                 game.scene.start('GameOver');
             }
         }
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/TamagotchiJavier
         return () => clearInterval(interval); // Limpiar el intervalo al desmontar
     }, [health, food, energy, happiness]);
 
