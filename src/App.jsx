@@ -110,6 +110,7 @@ function App() {
             scene.handlePoop();
             console.log("Haciendo popo");
             setHealth((prev) => Math.min(100, prev + 5)); // Incrementar salud
+            setFood((prev) => Math.max(0, prev - 10)); // Reducir comida
         }
     };
 
