@@ -95,6 +95,7 @@ export class Game extends Scene {
     }
 
     changeScene() {
+        this.scene.remove("Game");
         this.scene.start("GameOver");
     }
 
