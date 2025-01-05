@@ -50,7 +50,7 @@ export class Game extends Scene {
         createAnimations(this);
         // this.cameras.main.setBackgroundColor(0x00ff00);
 
-        this.add.image(512, 384, "background").setAlpha(0.5);
+        this.add.image(512, 384, "cloud1").setAlpha(0.5);
         this.add.image(0, -150, "room").setOrigin(0, 0).setScale(2);
 
         this.cat = this.add
@@ -92,10 +92,6 @@ export class Game extends Scene {
 
     update() {
         this.cat.anims.play("cat-idle", true);
-    }
-
-    changeScene() {
-        this.scene.start("GameOver");
     }
 
     handleEat() {

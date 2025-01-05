@@ -19,14 +19,20 @@ function App() {
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setHealth((prev) => Math.max(0, prev - 1)); // Reducir salud
-            setFood((prev) => Math.max(0, prev - 2)); // Reducir comida más rápido
-            setEnergy((prev) => Math.max(0, prev - 1)); // Reducir energía
-            setHappiness((prev) => Math.max(0, prev - 1)); // Reducir felicidad
+            setHealth((prev) => Math.max(0, prev - 10)); // Reducir salud
+            setFood((prev) => Math.max(0, prev - 20)); // Reducir comida más rápido
+            setEnergy((prev) => Math.max(0, prev - 10)); // Reducir energía
+            setHappiness((prev) => Math.max(0, prev - 10)); // Reducir felicidad
         }, 1000); // Cada segundo
-
+        if (health === 0) {
+            const game = phaserRef.current.game;
+            if (game) {
+                game.scene.remove('Game');
+                game.scene.start('GameOver');
+            }
+        }
         return () => clearInterval(interval); // Limpiar el intervalo al desmontar
-    }, []);
+    }, [health, food, energy, happiness]);
 
     // const changeScene = () => {
     //     const scene = phaserRef.current.scene;
