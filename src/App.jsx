@@ -6,7 +6,7 @@ import StatusBar from "./components/StatusBar";
 
 function App() {
     // The sprite can only be moved in the MainMenu Scene
-    const [currentScene, setCurrentScene] = useState(null);
+    const [currentScene, setCurrentScene] = useState("");
     const [canMoveSprite, setCanMoveSprite] = useState(true);
 
     //  References to the PhaserGame component (game and scene are exposed)
@@ -19,9 +19,19 @@ function App() {
     const [spritePosition, setSpritePosition] = useState({ x: 0, y: 0 });
 
     useEffect(() => {
+        if (currentScene?.scene?.key === "GameOver") {
+            setHealth(100);
+            setFood(100);
+            setEnergy(100);
+            setHappiness(100);
+        }
+        console.log(health, food, energy, happiness);
+    }, [currentScene]);
+
+    useEffect(() => {
         console.log("🚀 ~ useEffect ~ scene:", currentScene?.scene?.key);
         const sceneKey = currentScene?.scene?.key;
-        if (sceneKey?.localeCompare("Game") === 0) {
+        if (sceneKey === "Game") {
             const interval = setInterval(() => {
                 setHealth((prev) => Math.max(0, prev - 10)); // Reducir salud
                 setFood((prev) => Math.max(0, prev - 20)); // Reducir comida más rápido
@@ -31,7 +41,6 @@ function App() {
             if (health === 0) {
                 const game = phaserRef.current.game;
                 if (game) {
-                    game.scene.remove("Game");
                     game.scene.start("GameOver");
                 }
             }
