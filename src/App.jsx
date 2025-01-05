@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import Phaser from "phaser";
 import { PhaserGame } from "./game/PhaserGame";
@@ -6,6 +6,7 @@ import StatusBar from "./components/StatusBar";
 
 function App() {
     // The sprite can only be moved in the MainMenu Scene
+    const [currentScene, setCurrentScene] = useState(null);
     const [canMoveSprite, setCanMoveSprite] = useState(true);
 
     //  References to the PhaserGame component (game and scene are exposed)
@@ -18,21 +19,25 @@ function App() {
     const [spritePosition, setSpritePosition] = useState({ x: 0, y: 0 });
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            setHealth((prev) => Math.max(0, prev - 10)); // Reducir salud
-            setFood((prev) => Math.max(0, prev - 20)); // Reducir comida más rápido
-            setEnergy((prev) => Math.max(0, prev - 10)); // Reducir energía
-            setHappiness((prev) => Math.max(0, prev - 10)); // Reducir felicidad
-        }, 1000); // Cada segundo
-        if (health === 0) {
-            const game = phaserRef.current.game;
-            if (game) {
-                game.scene.remove('Game');
-                game.scene.start('GameOver');
+        console.log("🚀 ~ useEffect ~ scene:", currentScene?.scene?.key);
+        const sceneKey = currentScene?.scene?.key;
+        if (sceneKey?.localeCompare("Game") === 0) {
+            const interval = setInterval(() => {
+                setHealth((prev) => Math.max(0, prev - 10)); // Reducir salud
+                setFood((prev) => Math.max(0, prev - 20)); // Reducir comida más rápido
+                setEnergy((prev) => Math.max(0, prev - 10)); // Reducir energía
+                setHappiness((prev) => Math.max(0, prev - 10)); // Reducir felicidad
+            }, 1000); // Cada segundo
+            if (health === 0) {
+                const game = phaserRef.current.game;
+                if (game) {
+                    game.scene.remove("Game");
+                    game.scene.start("GameOver");
+                }
             }
+            return () => clearInterval(interval); // Limpiar el intervalo al desmontar
         }
-        return () => clearInterval(interval); // Limpiar el intervalo al desmontar
-    }, [health, food, energy, happiness]);
+    }, [health, food, energy, happiness, currentScene]);
 
     // const changeScene = () => {
     //     const scene = phaserRef.current.scene;
@@ -121,13 +126,17 @@ function App() {
     };
 
     // Event emitted from the PhaserGame component
-    const currentScene = (scene) => {
+    const handleCurrentScene = (scene) => {
+        setCurrentScene(scene);
         setCanMoveSprite(scene.scene.key !== "MainMenu");
     };
 
     return (
         <div id="app">
-            <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
+            <PhaserGame
+                ref={phaserRef}
+                currentActiveScene={handleCurrentScene}
+            />
             <div>
                 {/* <div>
                     <button className="button" onClick={changeScene}>
@@ -152,56 +161,59 @@ function App() {
                         Add New Sprite
                     </button>
                 </div> */}
-                <div style={{ marginTop: "20px", marginLeft: "10px" }}>
-                    <StatusBar
-                        label="Salud"
-                        icon="assets/icons/heart.png"
-                        value={health}
-                        color="#00ff00"
-                    />
-                    <StatusBar
-                        label="Comida"
-                        icon="assets/icons/naruto.png"
-                        value={food}
-                        color="#ff7203"
-                    />
-                    <StatusBar
-                        label="Energía"
-                        icon="assets/icons/flash.png"
-                        value={energy}
-                        color="#0000ff"
-                    />
-                    <StatusBar
-                        label="Felicidad"
-                        icon="assets/icons/happy.png"
-                        value={happiness}
-                        color="#ffff00"
-                    />
-                </div>
-                <div>
-                    <button className="button" onClick={catEating}>
-                        Alimentar
-                    </button>
-                </div>
-                <div>
-                    <button className="button" onClick={catSleeping}>
-                        Dormir
-                    </button>
-                </div>
-                <div>
-                    <button className="button" onClick={catPlaying}>
-                        Jugar
-                    </button>
-                </div>
-                <div>
-                    <button className="button" onClick={catPooping}>
-                        Hacer popo
-                    </button>
-                </div>
+                {currentScene?.scene?.key === "Game" && (
+                    <React.Fragment>
+                        <div style={{ marginTop: "20px", marginLeft: "10px" }}>
+                            <StatusBar
+                                label="Salud"
+                                icon="assets/icons/heart.png"
+                                value={health}
+                                color="#00ff00"
+                            />
+                            <StatusBar
+                                label="Comida"
+                                icon="assets/icons/naruto.png"
+                                value={food}
+                                color="#ff7203"
+                            />
+                            <StatusBar
+                                label="Energía"
+                                icon="assets/icons/flash.png"
+                                value={energy}
+                                color="#0000ff"
+                            />
+                            <StatusBar
+                                label="Felicidad"
+                                icon="assets/icons/happy.png"
+                                value={happiness}
+                                color="#ffff00"
+                            />
+                        </div>
+                        <div>
+                            <button className="button" onClick={catEating}>
+                                Alimentar
+                            </button>
+                        </div>
+                        <div>
+                            <button className="button" onClick={catSleeping}>
+                                Dormir
+                            </button>
+                        </div>
+                        <div>
+                            <button className="button" onClick={catPlaying}>
+                                Jugar
+                            </button>
+                        </div>
+                        <div>
+                            <button className="button" onClick={catPooping}>
+                                Hacer popo
+                            </button>
+                        </div>
+                    </React.Fragment>
+                )}
             </div>
         </div>
     );
 }
 
 export default App;
-
