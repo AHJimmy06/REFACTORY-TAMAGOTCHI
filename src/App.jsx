@@ -24,9 +24,15 @@ function App() {
             setEnergy((prev) => Math.max(0, prev - 1)); // Reducir energía
             setHappiness((prev) => Math.max(0, prev - 1)); // Reducir felicidad
         }, 1000); // Cada segundo
-
+        if (health === 0) {
+            const game = phaserRef.current.game;
+            if (game) {
+                game.scene.remove('Game');
+                game.scene.start('GameOver');
+            }
+        }
         return () => clearInterval(interval); // Limpiar el intervalo al desmontar
-    }, []);
+    }, [health, food, energy, happiness]);
 
     // const changeScene = () => {
     //     const scene = phaserRef.current.scene;

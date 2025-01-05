@@ -20,7 +20,20 @@ export class MainMenu extends Scene
     {
         createAnimations(this);
         this.add.image(0, -150, "Menu").setOrigin(0, 0).setScale(1.6);
-        this.add.image(512,350, 'playButton').setScale(0.5);
+        
+        const button = this.add.image(512,350,'playButton').setScale(0.5).setInteractive().setDisplaySize(300,150);
+
+        button.on('pointerdown', () => {
+            this.scene.start('Game');
+        });
+
+        button.on('pointerover', () => {
+            this.input.manager.canvas.style.cursor = 'pointer';
+        });
+        button.on('pointerout', () => {
+            this.input.manager.canvas.style.cursor = 'default';
+        });
+
         this.add.text(512, 125, 'Main Menu', {
             fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
             stroke: '#000000', strokeThickness: 8,
