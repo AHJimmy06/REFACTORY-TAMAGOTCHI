@@ -17,7 +17,9 @@ export class GameOver extends Scene
         const button = this.add.image(515,600,'finish').setInteractive().setDisplaySize(300,150);
 
         button.on('pointerdown', () => {
-            this.scene.start('MainMenu');
+            // this.scene.start('MainMenu');
+            window.location.reload();
+            // this.scene.launch('MainMenu');
         });
 
         button.on('pointerover', () => {

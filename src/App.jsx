@@ -33,10 +33,22 @@ function App() {
         const sceneKey = currentScene?.scene?.key;
         if (sceneKey === "Game") {
             const interval = setInterval(() => {
-                setHealth((prev) => Math.max(0, prev - 10)); // Reducir salud
                 setFood((prev) => Math.max(0, prev - 20)); // Reducir comida más rápido
                 setEnergy((prev) => Math.max(0, prev - 10)); // Reducir energía
                 setHappiness((prev) => Math.max(0, prev - 10)); // Reducir felicidad
+
+                if(food === 0) {
+                    setHealth((prev) => Math.max(0, prev - 5)); // Reducir salud
+                }
+
+                if(energy === 0) {
+                    setHealth((prev) => Math.max(0, prev - 3)); // Reducir salud
+                }
+
+                if(happiness === 0) {
+                    setHealth((prev) => Math.max(0, prev - 2)); // Reducir salud
+                }
+
             }, 1000); // Cada segundo
             if (health === 0) {
                 const game = phaserRef.current.game;
