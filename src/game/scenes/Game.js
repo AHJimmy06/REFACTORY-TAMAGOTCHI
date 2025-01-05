@@ -94,11 +94,6 @@ export class Game extends Scene {
         this.cat.anims.play("cat-idle", true);
     }
 
-    changeScene() {
-        this.scene.remove("Game");
-        this.scene.start("GameOver");
-    }
-
     handleEat() {
         console.log("handleEat");
         this.cat.anims.play("cat-eat", true);
