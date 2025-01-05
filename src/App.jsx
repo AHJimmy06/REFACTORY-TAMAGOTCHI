@@ -15,8 +15,23 @@ function App() {
     const [food, setFood] = useState(100);
     const [energy, setEnergy] = useState(100);
     const [happiness, setHappiness] = useState(100);
+    let statusPet = localStorage.getItem("statusPet");
 
     const [spritePosition, setSpritePosition] = useState({ x: 0, y: 0 });
+
+    useEffect(() => {
+        if (statusPet) {
+            // const game = phaserRef.current.game;
+            // if (game) {
+            //     game.scene.start("Game");
+            // }
+            const status = JSON.parse(statusPet);
+            setHealth(status.health);
+            setFood(status.food);
+            setEnergy(status.energy);
+            setHappiness(status.happiness);
+        }
+    }, []);
 
     useEffect(() => {
         if (currentScene?.scene?.key === "GameOver") {
@@ -33,24 +48,27 @@ function App() {
         const sceneKey = currentScene?.scene?.key;
         if (sceneKey === "Game") {
             const interval = setInterval(() => {
-                setFood((prev) => Math.max(0, prev - 20)); // Reducir comida más rápido
-                setEnergy((prev) => Math.max(0, prev - 10)); // Reducir energía
-                setHappiness((prev) => Math.max(0, prev - 10)); // Reducir felicidad
+                setFood((prev) => Math.max(0, prev - 3)); // Reducir comida más rápido
+                setEnergy((prev) => Math.max(0, prev - 1)); // Reducir energía
+                setHappiness((prev) => Math.max(0, prev - 1)); // Reducir felicidad
 
-                if(food === 0) {
-                    setHealth((prev) => Math.max(0, prev - 5)); // Reducir salud
-                }
-
-                if(energy === 0) {
-                    setHealth((prev) => Math.max(0, prev - 3)); // Reducir salud
-                }
-
-                if(happiness === 0) {
+                if (food === 0) {
                     setHealth((prev) => Math.max(0, prev - 2)); // Reducir salud
                 }
 
+                if (energy === 0) {
+                    setHealth((prev) => Math.max(0, prev - 1)); // Reducir salud
+                }
+
+                if (happiness === 0) {
+                    setHealth((prev) => Math.max(0, prev - 0.5)); // Reducir salud
+                }
+
+                statusPet = JSON.stringify({ health, food, energy, happiness });
+                localStorage.setItem("statusPet", statusPet);
             }, 1000); // Cada segundo
             if (health === 0) {
+                localStorage.clear();
                 const game = phaserRef.current.game;
                 if (game) {
                     game.scene.start("GameOver");

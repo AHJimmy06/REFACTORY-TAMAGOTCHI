@@ -8,7 +8,6 @@ export class Game extends Scene {
     }
 
     preload() {
-        this.load.image("cloud1", "assets/enviroment/cloud1.png");
         this.load.image("room", "assets/enviroment/room2.png");
 
         this.load.audio("eat", "assets/sounds/eatCookie.mp3");
