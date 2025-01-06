@@ -14,23 +14,11 @@ function App() {
 
     //  References to the PhaserGame component (game and scene are exposed)
     const phaserRef = useRef();
-    // const [health, setHealth] = useState(100);
-    // const [food, setFood] = useState(100);
-    // const [energy, setEnergy] = useState(100);
-    // const [happiness, setHappiness] = useState(100);
     let statusPet = localStorage.getItem("statusPet");
 
     useEffect(() => {
         if (statusPet) {
-            // const game = phaserRef.current.game;
-            // if (game) {
-            //     game.scene.start("Game");
-            // }
             const status = JSON.parse(statusPet);
-            // setHealth(status.health);
-            // setFood(status.food);
-            // setEnergy(status.energy);
-            // setHappiness(status.happiness);
             setPetStatus(
                 new PetStatus(
                     status.health,
@@ -42,40 +30,11 @@ function App() {
         }
     }, []);
 
-    // useEffect(() => {
-    //     if (currentScene?.scene?.key === "GameOver") {
-    //         // setHealth(100);
-    //         // setFood(100);
-    //         // setEnergy(100);
-    //         // setHappiness(100);
-    //     }
-    //     console.log(health, food, energy, happiness);
-    // }, [currentScene]);
-
     useEffect(() => {
         console.log("🚀 ~ useEffect ~ scene:", currentScene?.scene?.key);
         const sceneKey = currentScene?.scene?.key;
         if (sceneKey === "Game") {
             const interval = setInterval(() => {
-                // setFood((prev) => Math.max(0, prev - 3)); // Reducir comida más rápido
-                // setEnergy((prev) => Math.max(0, prev - 1)); // Reducir energía
-                // setHappiness((prev) => Math.max(0, prev - 1)); // Reducir felicidad
-
-                // if (food === 0) {
-                //     setHealth((prev) => Math.max(0, prev - 2)); // Reducir salud
-                // }
-
-                // if (energy === 0) {
-                //     setHealth((prev) => Math.max(0, prev - 1)); // Reducir salud
-                // }
-
-                // if (happiness === 0) {
-                //     setHealth((prev) => Math.max(0, prev - 0.5)); // Reducir salud
-                // }
-                // statusPet = JSON.stringify({ health, food, energy, happiness });
-                // localStorage.setItem("statusPet", statusPet);
-
-                // const updatedStatus = { ...petStatus };
                 petStatus.reduceFood(50);
                 petStatus.reduceEnergy(50);
                 petStatus.reduceHappiness(50);
@@ -109,7 +68,7 @@ function App() {
         if (scene) {
             scene.handleEat();
             console.log("Alimentando");
-            setFood((prev) => Math.min(100, prev + 20));
+            petStatus.increaseFood((prev) => Math.min(100, prev + 20));
         }
     };
 
@@ -119,7 +78,7 @@ function App() {
         if (scene) {
             scene.handleSleep();
             console.log("Durmiendo");
-            setEnergy((prev) => Math.min(100, prev + 30)); // Incrementar energía
+            petStatus.increaseEnergy((prev) => Math.min(100, prev + 30)); // Incrementar energía
         }
     };
 
@@ -129,9 +88,9 @@ function App() {
         if (scene) {
             scene.handlePlay();
             console.log("Jugando");
-            setEnergy((prev) => Math.max(0, prev - 10)); // Reducir energía
-            setHealth((prev) => Math.min(100, prev + 10)); // Incrementar salud
-            setHappiness((prev) => Math.min(100, prev + 20)); // Incrementar felicidad
+            petStatus.increaseEnergy((prev) => Math.max(0, prev - 10)); // Reducir energía
+            petStatus.increaseHealth((prev) => Math.min(100, prev + 10)); // Incrementar salud
+            petStatus.increaseHappiness((prev) => Math.min(100, prev + 20)); // Incrementar felicidad
         }
     };
 
@@ -141,15 +100,14 @@ function App() {
         if (scene) {
             scene.handlePoop();
             console.log("Haciendo popo");
-            setHealth((prev) => Math.min(100, prev + 5)); // Incrementar salud
-            setFood((prev) => Math.max(0, prev - 10)); // Reducir comida
+            petStatus.increaseHealth((prev) => Math.min(100, prev + 5)); // Incrementar salud
+            petStatus.increaseFood((prev) => Math.max(0, prev - 10)); // Reducir comida
         }
     };
 
     // Event emitted from the PhaserGame component
     const handleCurrentScene = (scene) => {
         setCurrentScene(scene);
-        // setCanMoveSprite(scene.scene.key !== "MainMenu");
     };
 
     return (
