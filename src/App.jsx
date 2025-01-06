@@ -1,23 +1,24 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import Phaser from "phaser";
-import { PhaserGame } from "./game/PhaserGame";
 import StatusBar from "./components/StatusBar";
+import { PhaserGame } from "./game/PhaserGame";
+import { PetStatus } from "./utils/PetStatus";
 
 function App() {
     // The sprite can only be moved in the MainMenu Scene
     const [currentScene, setCurrentScene] = useState("");
-    const [canMoveSprite, setCanMoveSprite] = useState(true);
+
+    const [petStatus, setPetStatus] = useState(
+        new PetStatus(100, 100, 100, 100)
+    );
 
     //  References to the PhaserGame component (game and scene are exposed)
     const phaserRef = useRef();
-    const [health, setHealth] = useState(100);
-    const [food, setFood] = useState(100);
-    const [energy, setEnergy] = useState(100);
-    const [happiness, setHappiness] = useState(100);
+    // const [health, setHealth] = useState(100);
+    // const [food, setFood] = useState(100);
+    // const [energy, setEnergy] = useState(100);
+    // const [happiness, setHappiness] = useState(100);
     let statusPet = localStorage.getItem("statusPet");
-
-    const [spritePosition, setSpritePosition] = useState({ x: 0, y: 0 });
 
     useEffect(() => {
         if (statusPet) {
@@ -26,100 +27,81 @@ function App() {
             //     game.scene.start("Game");
             // }
             const status = JSON.parse(statusPet);
-            setHealth(status.health);
-            setFood(status.food);
-            setEnergy(status.energy);
-            setHappiness(status.happiness);
+            // setHealth(status.health);
+            // setFood(status.food);
+            // setEnergy(status.energy);
+            // setHappiness(status.happiness);
+            setPetStatus(
+                new PetStatus(
+                    status.health,
+                    status.food,
+                    status.energy,
+                    status.happiness
+                )
+            );
         }
     }, []);
 
-    useEffect(() => {
-        if (currentScene?.scene?.key === "GameOver") {
-            setHealth(100);
-            setFood(100);
-            setEnergy(100);
-            setHappiness(100);
-        }
-        console.log(health, food, energy, happiness);
-    }, [currentScene]);
+    // useEffect(() => {
+    //     if (currentScene?.scene?.key === "GameOver") {
+    //         // setHealth(100);
+    //         // setFood(100);
+    //         // setEnergy(100);
+    //         // setHappiness(100);
+    //     }
+    //     console.log(health, food, energy, happiness);
+    // }, [currentScene]);
 
     useEffect(() => {
         console.log("🚀 ~ useEffect ~ scene:", currentScene?.scene?.key);
         const sceneKey = currentScene?.scene?.key;
         if (sceneKey === "Game") {
             const interval = setInterval(() => {
-                setFood((prev) => Math.max(0, prev - 3)); // Reducir comida más rápido
-                setEnergy((prev) => Math.max(0, prev - 1)); // Reducir energía
-                setHappiness((prev) => Math.max(0, prev - 1)); // Reducir felicidad
+                // setFood((prev) => Math.max(0, prev - 3)); // Reducir comida más rápido
+                // setEnergy((prev) => Math.max(0, prev - 1)); // Reducir energía
+                // setHappiness((prev) => Math.max(0, prev - 1)); // Reducir felicidad
 
-                if (food === 0) {
-                    setHealth((prev) => Math.max(0, prev - 2)); // Reducir salud
-                }
+                // if (food === 0) {
+                //     setHealth((prev) => Math.max(0, prev - 2)); // Reducir salud
+                // }
 
-                if (energy === 0) {
-                    setHealth((prev) => Math.max(0, prev - 1)); // Reducir salud
-                }
+                // if (energy === 0) {
+                //     setHealth((prev) => Math.max(0, prev - 1)); // Reducir salud
+                // }
 
-                if (happiness === 0) {
-                    setHealth((prev) => Math.max(0, prev - 0.5)); // Reducir salud
-                }
+                // if (happiness === 0) {
+                //     setHealth((prev) => Math.max(0, prev - 0.5)); // Reducir salud
+                // }
+                // statusPet = JSON.stringify({ health, food, energy, happiness });
+                // localStorage.setItem("statusPet", statusPet);
 
-                statusPet = JSON.stringify({ health, food, energy, happiness });
-                localStorage.setItem("statusPet", statusPet);
+                // const updatedStatus = { ...petStatus };
+                petStatus.reduceFood(50);
+                petStatus.reduceEnergy(50);
+                petStatus.reduceHappiness(50);
+
+                setPetStatus(
+                    new PetStatus(
+                        petStatus.health,
+                        petStatus.food,
+                        petStatus.energy,
+                        petStatus.happiness
+                    )
+                );
+
+                localStorage.setItem("statusPet", JSON.stringify(petStatus));
             }, 1000); // Cada segundo
-            if (health === 0) {
-                localStorage.clear();
+            console.log(petStatus);
+            if (petStatus.health === 0) {
                 const game = phaserRef.current.game;
                 if (game) {
                     game.scene.start("GameOver");
                 }
+                localStorage.clear();
             }
             return () => clearInterval(interval); // Limpiar el intervalo al desmontar
         }
-    }, [health, food, energy, happiness, currentScene]);
-
-    // const changeScene = () => {
-    //     const scene = phaserRef.current.scene;
-
-    //     if (scene) {
-    //         scene.changeScene();
-    //     }
-    // };
-
-    // const moveSprite = () => {
-    //     const scene = phaserRef.current.scene;
-
-    //     if (scene && scene.scene.key === "MainMenu") {
-    //         // Get the update logo position
-    //         scene.moveLogo(({ x, y }) => {
-    //             setSpritePosition({ x, y });
-    //         });
-    //     }
-    // };
-
-    // const addSprite = () => {
-    //     const scene = phaserRef.current.scene;
-
-    //     if (scene) {
-    //         // Add more stars
-    //         const x = Phaser.Math.Between(64, scene.scale.width - 64);
-    //         const y = Phaser.Math.Between(64, scene.scale.height - 64);
-
-    //         //  `add.sprite` is a Phaser GameObjectFactory method and it returns a Sprite Game Object instance
-    //         const star = scene.add.sprite(x, y, "star");
-
-    //         //  ... which you can then act upon. Here we create a Phaser Tween to fade the star sprite in and out.
-    //         //  You could, of course, do this from within the Phaser Scene code, but this is just an example
-    //         //  showing that Phaser objects and systems can be acted upon from outside of Phaser itself.
-    //         scene.add.tween({
-    //             targets: star,
-    //             duration: 500 + Math.random() * 1000,
-    //             alpha: 0,
-    //             yoyo: true,
-    //             repeat: -1,
-    //         });
-    //     }
-    // };
+    }, [petStatus, currentScene]);
 
     const catEating = () => {
         const scene = phaserRef.current.scene;
@@ -167,7 +149,7 @@ function App() {
     // Event emitted from the PhaserGame component
     const handleCurrentScene = (scene) => {
         setCurrentScene(scene);
-        setCanMoveSprite(scene.scene.key !== "MainMenu");
+        // setCanMoveSprite(scene.scene.key !== "MainMenu");
     };
 
     return (
@@ -206,25 +188,28 @@ function App() {
                             <StatusBar
                                 label="Salud"
                                 icon="assets/icons/heart.png"
-                                value={health}
+                                // value={health}
+                                value={petStatus.health}
                                 color="#00ff00"
                             />
                             <StatusBar
                                 label="Comida"
                                 icon="assets/icons/naruto.png"
-                                value={food}
+                                // value={food}
+                                value={petStatus.food}
                                 color="#ff7203"
                             />
                             <StatusBar
                                 label="Energía"
                                 icon="assets/icons/flash.png"
-                                value={energy}
+                                // value={energy}
+                                value={petStatus.energy}
                                 color="#0000ff"
                             />
                             <StatusBar
                                 label="Felicidad"
                                 icon="assets/icons/happy.png"
-                                value={happiness}
+                                value={petStatus.happiness}
                                 color="#ffff00"
                             />
                         </div>
@@ -256,3 +241,4 @@ function App() {
 }
 
 export default App;
+
