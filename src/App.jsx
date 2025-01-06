@@ -83,7 +83,7 @@ function App() {
             scene.handleAction("eat");
             console.log("Alimentando");
 
-            petStatus.increaseFood(10);
+            petStatus.increaseFood(30);
         }
     };
 
