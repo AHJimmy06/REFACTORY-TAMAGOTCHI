@@ -35,9 +35,9 @@ function App() {
         const sceneKey = currentScene?.scene?.key;
         if (sceneKey === "Game") {
             const interval = setInterval(() => {
-                petStatus.reduceFood(50);
-                petStatus.reduceEnergy(50);
-                petStatus.reduceHappiness(50);
+                petStatus.reduceFood(3);
+                petStatus.reduceEnergy(1);
+                petStatus.reduceHappiness(1);
 
                 setPetStatus(
                     new PetStatus(
@@ -68,7 +68,8 @@ function App() {
         if (scene) {
             scene.handleEat();
             console.log("Alimentando");
-            petStatus.increaseFood((prev) => Math.min(100, prev + 20));
+
+            petStatus.increaseFood(10);
         }
     };
 
@@ -78,7 +79,7 @@ function App() {
         if (scene) {
             scene.handleSleep();
             console.log("Durmiendo");
-            petStatus.increaseEnergy((prev) => Math.min(100, prev + 30)); // Incrementar energía
+            petStatus.increaseEnergy(20); // Incrementar energía
         }
     };
 
@@ -88,9 +89,9 @@ function App() {
         if (scene) {
             scene.handlePlay();
             console.log("Jugando");
-            petStatus.increaseEnergy((prev) => Math.max(0, prev - 10)); // Reducir energía
-            petStatus.increaseHealth((prev) => Math.min(100, prev + 10)); // Incrementar salud
-            petStatus.increaseHappiness((prev) => Math.min(100, prev + 20)); // Incrementar felicidad
+            petStatus.reduceEnergy(10);
+            petStatus.increaseHealth(10); // Incrementar salud
+            petStatus.increaseHappiness(20); // Incrementar felicidad
         }
     };
 
@@ -100,8 +101,8 @@ function App() {
         if (scene) {
             scene.handlePoop();
             console.log("Haciendo popo");
-            petStatus.increaseHealth((prev) => Math.min(100, prev + 5)); // Incrementar salud
-            petStatus.increaseFood((prev) => Math.max(0, prev - 10)); // Reducir comida
+            petStatus.increaseHealth(5); // Incrementar salud
+            petStatus.reduceFood(10); // Reducir comida
         }
     };
 
