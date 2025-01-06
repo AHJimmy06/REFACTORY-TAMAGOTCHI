@@ -18,6 +18,15 @@ export const createAnimations = (game) => {
         repeat: -1,
     });
     game.anims.create({
+        key: "cat-wake",
+        frames: game.anims.generateFrameNumbers("catWake", {
+            start: 0,
+            end: 7,
+        }),
+        frameRate: 5,
+        repeat: -1,
+    });
+    game.anims.create({
         key: "cat-happy",
         frames: game.anims.generateFrameNumbers("catHappy", {
             start: 0,
@@ -57,7 +66,7 @@ export const createAnimations = (game) => {
             end: 3,
         }),
         frameRate: 5,
-        repeat: 5,
+        repeat: -1,
     });
     game.anims.create({
         key: "cat-pooping",

@@ -1,11 +1,18 @@
 import { EventBus } from "../EventBus";
 import { Scene } from "phaser";
 import { createAnimations } from "../animations";
-import { EatStrategy, PlayStrategy, PoopStrategy, SleepStrategy } from "../../utils/CatActionStrategy";
+import {
+    EatStrategy,
+    PlayStrategy,
+    PoopStrategy,
+    SleepStrategy,
+    WakeStrategy,
+} from "../../utils/CatActionStrategy";
 
 export class Game extends Scene {
     constructor() {
         super("Game");
+        this.energyTimer = null;
     }
 
     preload() {
@@ -17,6 +24,10 @@ export class Game extends Scene {
             frameHeight: 32,
         });
         this.load.spritesheet("catIdle", "assets/personaje/Idle.png", {
+            frameWidth: 32,
+            frameHeight: 32,
+        });
+        this.load.spritesheet("catWake", "assets/personaje/Idle.png", {
             frameWidth: 32,
             frameHeight: 32,
         });
@@ -59,9 +70,11 @@ export class Game extends Scene {
             .setScale(4)
             .setPosition(480, 450);
 
-        this.cat.on("animationcomplete", () => {
-            this.cat.anims.play("cat-idle", true);
-        });
+        
+
+        // this.cat.on("animationcomplete", () => {
+        //     this.cat.anims.play("cat-idle", true);
+        // });
 
         // this.add.text(512, 384, 'Make something fun!\nand share it with us:\nsupport@phaser.io', {
         //     fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
@@ -76,7 +89,7 @@ export class Game extends Scene {
         this.anims.addMix("cat-eat", "cat-idle", 200);
 
         // mix idle and sleep
-        this.anims.addMix("cat-idle", "cat-sleep", 200);
+        // this.anims.addMix("cat-idle", "cat-sleep", 200);
         // this.anims.addMix("cat-sleepy", "cat-sleep", 200);
         this.anims.addMix("cat-sleep", "cat-idle", 200);
 
@@ -87,11 +100,19 @@ export class Game extends Scene {
         // mix idle and pooping
         this.anims.addMix("cat-idle", "cat-pooping", 200);
         this.anims.addMix("cat-pooping", "cat-idle", 200);
+
+        // this.anims.addMix("cat-sleep", "cat-wake", 200);
+        this.anims.addMix("cat-wake", "cat-idle", 200);
+
         EventBus.emit("current-scene-ready", this);
     }
 
     update() {
         this.cat.anims.play("cat-idle", true);
+        if (this.cat.anims.currentAnim.key === "cat-sleep") {
+            console.log(this.cat.anims.currentAnim.key, "=====")
+            this.cat.anims.play("cat-idle", true);
+        }
     }
 
     handleAction(action) {
@@ -102,6 +123,9 @@ export class Game extends Scene {
                 break;
             case "sleep":
                 this.catAction = new SleepStrategy(this.cat);
+                break;
+            case "wake":
+                this.catAction = new WakeStrategy(this.cat);
                 break;
             case "play":
                 this.catAction = new PlayStrategy(this.cat);

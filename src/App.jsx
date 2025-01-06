@@ -31,12 +31,26 @@ function App() {
     }, []);
 
     useEffect(() => {
-        console.log("🚀 ~ useEffect ~ scene:", currentScene?.scene?.key);
         const sceneKey = currentScene?.scene?.key;
         if (sceneKey === "Game") {
             const interval = setInterval(() => {
                 petStatus.reduceFood(3);
-                petStatus.reduceEnergy(1);
+                const scene = phaserRef.current.scene;
+                const currentAnim =
+                    phaserRef.current.scene.cat.anims.currentAnim.key;
+                if (currentAnim !== "cat-sleep") {
+                    petStatus.reduceEnergy(10);
+                } else {
+                    petStatus.increaseEnergy(20);
+                    console.log(petStatus.energy, "Energía");
+                    if (petStatus.energy < 100) {
+                        petStatus.increaseEnergy(20);
+                    }
+                    if (petStatus.energy >= 100) {
+                        console.log("Despertando");
+                        scene.handleAction("wake");
+                    }
+                }
                 petStatus.reduceHappiness(1);
 
                 setPetStatus(
@@ -66,7 +80,7 @@ function App() {
         const scene = phaserRef.current.scene;
 
         if (scene) {
-            scene.handleAction('eat');
+            scene.handleAction("eat");
             console.log("Alimentando");
 
             petStatus.increaseFood(10);
@@ -77,9 +91,8 @@ function App() {
         const scene = phaserRef.current.scene;
 
         if (scene) {
-            scene.handleAction('sleep');
+            scene.handleAction("sleep");
             console.log("Durmiendo");
-            petStatus.increaseEnergy(20); // Incrementar energía
         }
     };
 
@@ -87,7 +100,7 @@ function App() {
         const scene = phaserRef.current.scene;
 
         if (scene) {
-            scene.handleAction('play');
+            scene.handleAction("play");
             console.log("Jugando");
             petStatus.reduceEnergy(10);
             petStatus.increaseHealth(10); // Incrementar salud
@@ -99,7 +112,7 @@ function App() {
         const scene = phaserRef.current.scene;
 
         if (scene) {
-            scene.handleAction('poop');
+            scene.handleAction("poop");
             console.log("Haciendo popo");
             petStatus.increaseHealth(5); // Incrementar salud
             petStatus.reduceFood(10); // Reducir comida

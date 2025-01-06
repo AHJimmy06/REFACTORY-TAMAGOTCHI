@@ -25,6 +25,14 @@ export class SleepStrategy extends CatActionStrategy {
     }
 }
 
+export class WakeStrategy extends CatActionStrategy {
+    execute() {
+        console.log("Despertando desde strategy");
+        // this.cat.setPosition(460, 200);
+        this.cat.anims.play("cat-wake", true);
+    }
+}
+
 export class PlayStrategy extends CatActionStrategy {
     execute() {
         console.log("handlePlay");
