@@ -66,7 +66,7 @@ function App() {
         const scene = phaserRef.current.scene;
 
         if (scene) {
-            scene.handleEat();
+            scene.handleAction('eat');
             console.log("Alimentando");
 
             petStatus.increaseFood(10);
@@ -77,7 +77,7 @@ function App() {
         const scene = phaserRef.current.scene;
 
         if (scene) {
-            scene.handleSleep();
+            scene.handleAction('sleep');
             console.log("Durmiendo");
             petStatus.increaseEnergy(20); // Incrementar energía
         }
@@ -87,7 +87,7 @@ function App() {
         const scene = phaserRef.current.scene;
 
         if (scene) {
-            scene.handlePlay();
+            scene.handleAction('play');
             console.log("Jugando");
             petStatus.reduceEnergy(10);
             petStatus.increaseHealth(10); // Incrementar salud
@@ -99,7 +99,7 @@ function App() {
         const scene = phaserRef.current.scene;
 
         if (scene) {
-            scene.handlePoop();
+            scene.handleAction('poop');
             console.log("Haciendo popo");
             petStatus.increaseHealth(5); // Incrementar salud
             petStatus.reduceFood(10); // Reducir comida

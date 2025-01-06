@@ -1,6 +1,7 @@
 import { EventBus } from "../EventBus";
 import { Scene } from "phaser";
 import { createAnimations } from "../animations";
+import { EatStrategy, PlayStrategy, PoopStrategy, SleepStrategy } from "../../utils/CatActionStrategy";
 
 export class Game extends Scene {
     constructor() {
@@ -93,28 +94,51 @@ export class Game extends Scene {
         this.cat.anims.play("cat-idle", true);
     }
 
-    handleEat() {
-        console.log("handleEat");
-        this.cat.setPosition(300, 550);
-        this.cat.anims.play("cat-eat", true);
+    handleAction(action) {
+        // Cambiar la estrategia según la acción
+        switch (action) {
+            case "eat":
+                this.catAction = new EatStrategy(this.cat);
+                break;
+            case "sleep":
+                this.catAction = new SleepStrategy(this.cat);
+                break;
+            case "play":
+                this.catAction = new PlayStrategy(this.cat);
+                break;
+            case "poop":
+                this.catAction = new PoopStrategy(this.cat);
+                break;
+            default:
+                console.log("Acción no reconocida");
+                return;
+        }
+        // Ejecutar la acción
+        this.catAction.execute();
     }
 
-    handleSleep() {
-        console.log("handleSleep");
-        this.cat.setPosition(460, 270);
-        this.cat.anims.play("cat-sleep", true);
-    }
+    // handleEat() {
+    //     console.log("handleEat");
+    //     this.cat.setPosition(300, 550);
+    //     this.cat.anims.play("cat-eat", true);
+    // }
 
-    handlePlay() {
-        console.log("handlePlay");
-        this.cat.setPosition(780, 290);
-        this.cat.anims.play("cat-play", true);
-    }
+    // handleSleep() {
+    //     console.log("handleSleep");
+    //     this.cat.setPosition(460, 270);
+    //     this.cat.anims.play("cat-sleep", true);
+    // }
 
-    handlePoop() {
-        console.log("handlePoop");
-        this.cat.setPosition(700, 500);
-        this.cat.anims.play("cat-pooping", true);
-    }
+    // handlePlay() {
+    //     console.log("handlePlay");
+    //     this.cat.setPosition(780, 290);
+    //     this.cat.anims.play("cat-play", true);
+    // }
+
+    // handlePoop() {
+    //     console.log("handlePoop");
+    //     this.cat.setPosition(700, 500);
+    //     this.cat.anims.play("cat-pooping", true);
+    // }
 }
 
