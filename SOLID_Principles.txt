@@ -1,0 +1,45 @@
+REFACTORIZACIÓN SOLID - PROYECTO TAMAGOTCHI
+
+Este documento detalla la aplicación de los principios SOLID durante la refactorización del proyecto.
+
+1. S - Single Responsibility Principle (Responsabilidad Única)
+-------------------------------------------------------------
+ANTES: 
+- 'App.jsx' manejaba el estado, el timer del juego, la lógica de hambre/sueño y la UI.
+- 'Game.js' manejaba animaciones, carga de assets y posicionamiento fijo.
+DESPUÉS: 
+- 'Pet.js' (Entidad) solo conoce las reglas de supervivencia del gato.
+- 'Use Cases' solo orquestan una acción específica (ej: 'FeedPetUseCase').
+- 'App.jsx' solo se encarga de renderizar componentes de React.
+
+2. O - Open/Closed Principle (Abierto/Cerrado)
+----------------------------------------------
+ANTES: 
+- Para agregar una acción, había que modificar un switch gigante en 'Game.js' y 'App.jsx'.
+DESPUÉS: 
+- Implementamos el patrón Strategy en 'CatActionStrategy.js'. Para agregar una acción nueva (ej: 'Bañar'), solo creamos una nueva clase que extienda la base, sin tocar la lógica de 'Game.js'.
+
+3. L - Liskov Substitution Principle (Sustitución de Liskov)
+-----------------------------------------------------------
+ANTES: 
+- No existía una jerarquía clara de comportamientos.
+DESPUÉS: 
+- Todas las estrategias de acción (Eat, Sleep, Play) derivan de 'CatActionStrategy'. El 'PetController' puede ejecutar cualquier estrategia de forma intercambiable sin saber cuál es, garantizando que el contrato 'execute()' se cumpla siempre.
+
+4. I - Interface Segregation Principle (Segregación de Interfaz)
+---------------------------------------------------------------
+ANTES: 
+- El objeto de estado del gato se pasaba entero a todos lados, incluso a componentes que solo necesitaban un valor.
+DESPUÉS: 
+- Los Casos de Uso y el Repositorio tienen métodos específicos. El Core no expone más de lo que la UI o Phaser necesitan para operar en un momento dado.
+
+5. D - Dependency Inversion Principle (Inversión de Dependencia)
+----------------------------------------------------------------
+ANTES: 
+- La lógica de negocio dependía directamente de 'localStorage' y de las animaciones de Phaser.
+DESPUÉS: 
+- El Core no sabe que existe el navegador. Interactúa con una abstracción ('PetRepository'). La implementación concreta ('LocalStoragePetRepository') se inyecta o se usa desde los adaptadores, permitiendo cambiar el motor de persistencia sin tocar al gato.
+
+CONCLUSIÓN FINAL:
+-----------------
+Adoptar SOLID permitió transformar un código rígido y frágil en un sistema modular. Ahora, el riesgo de introducir bugs al agregar funcionalidades es mínimo, ya que los componentes están desacoplados y tienen responsabilidades claras. El código es más fácil de testear, leer y mantener a largo plazo.

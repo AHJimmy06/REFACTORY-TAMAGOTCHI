@@ -34,12 +34,16 @@ export const PhaserGame = forwardRef(function PhaserGame ({ currentActiveScene }
     useEffect(() => {
 
         EventBus.on('current-scene-ready', (currentScene) => {
-
+            console.log("EventBus: current-scene-ready received", currentScene?.scene?.key);
             if (currentActiveScene instanceof Function)
             {
                 currentActiveScene(currentScene);
             }
-            ref.current.scene = currentScene;
+
+            if (ref && ref.current)
+            {
+                ref.current.scene = currentScene;
+            }
         });
 
         return () => {

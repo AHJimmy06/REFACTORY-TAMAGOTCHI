@@ -1,41 +1,56 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
-import { createAnimations } from '../animations';
 
 export class MainMenu extends Scene
 {
-    logoTween;
-
     constructor ()
     {
         super('MainMenu');
     }
 
-    preload (){
-       this.load.image('Menu', 'assets/enviroment/bgMenu.jpg');
-       this.load.image('playButton', 'assets/enviroment/playButton.png');
-    }
-
     create ()
     {
-        this.add.image(512, 384, 'background');
+        const centerX = this.cameras.main.centerX;
+        const centerY = this.cameras.main.centerY;
 
-
-        this.add.image(0, -150, 'Menu').setOrigin(0, 0).setScale(1.6);
+        // Fondo centrado
+        this.add.image(centerX, centerY, 'Menu').setOrigin(0.5, 0.5).setScale(1.6);
         
-        const button = this.add.image(512,350,'playButton').setScale(0.5).setInteractive().setDisplaySize(300,150);
+        // Botón Play centrado
+        const button = this.add.image(centerX, centerY + 50, 'playButton')
+            .setInteractive()
+            .setOrigin(0.5, 0.5)
+            .setDisplaySize(300, 150);
 
         button.on('pointerdown', () => {
             this.scene.start('Game');
         });
 
         button.on('pointerover', () => {
-            this.input.manager.canvas.style.cursor = 'pointer';
+            this.game.canvas.style.cursor = 'pointer';
+            button.setTint(0x44ff44); // Un pequeño feedback visual no viene mal
         });
+        
         button.on('pointerout', () => {
-            this.input.manager.canvas.style.cursor = 'default';
+            this.game.canvas.style.cursor = 'default';
+            button.clearTint();
         });
         
         EventBus.emit('current-scene-ready', this);
+
+        // Re-centrar si el contenedor cambia de tamaño
+        this.scale.on('resize', (gameSize) => {
+            const width = gameSize.width;
+            const height = gameSize.height;
+            const cX = width / 2;
+            const cY = height / 2;
+            
+            this.children.list.forEach(child => {
+                if (child.texture) {
+                    if (child.texture.key === 'Menu') child.setPosition(cX, cY);
+                    if (child.texture.key === 'playButton') child.setPosition(cX, cY + 50);
+                }
+            });
+        });
     }    
 }

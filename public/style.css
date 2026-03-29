@@ -1,48 +1,143 @@
 body {
     margin: 0;
     padding: 0;
-    color: rgba(255, 255, 255, 0.87);
-    background-color: #000000; 
-    font-family: Arial, Helvetica, sans-serif;
+    background-color: #2d1b18; /* Nogal Profundo para el vacío */
+    font-family: "Press Start 2P", cursive;
+    overflow: hidden;
+    color: #f5f5dc; /* Texto Crema */
+    font-size: 12px;
 }
 
 #app {
-    width: 100%;
+    width: 100vw;
     height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- GAME LAYER (Estructura Intacta) --- */
+.game-layer {
+    flex: 1;
+    width: 100%;
+    background: #000;
+    display: flex;
     overflow: hidden;
+}
+
+#game-container {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+canvas {
+    width: 100% !important;
+    height: 100% !important;
+    image-rendering: pixelated;
+    object-fit: contain;
+}
+
+/* --- STATS LAYER (Solo Colores) --- */
+.stats-layer {
+    height: 80px;
+    background: #4e342e; /* Madera Nogal */
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    padding: 0 20px;
+    align-items: center;
+    border-top: 3px solid #f5f5dc; /* Borde Crema */
+
+    border-right: 3px solid #f5f5dc;
+    border-left: 3px solid #f5f5dc;
+    z-index: 10;
+    box-sizing: border-box;
+}
+
+.stats-layer span {
+    font-size: 10px;
+    letter-spacing: -1px;
+    color: #f5f5dc;
+}
+
+/* --- CONTROLS LAYER (Solo Colores) --- */
+.controls-layer {
+    height: 110px;
+    background: #4e342e; /* Madera Nogal */
     display: flex;
     justify-content: center;
     align-items: center;
+    border-bottom: 3px solid #f5f5dc; /* Borde Crema */
+    border-right: 3px solid #f5f5dc;
+    border-left: 3px solid #f5f5dc;
+    z-index: 10;
+    box-sizing: border-box;
 }
 
-.spritePosition {
-    margin: 10px 0 0 10px;
-    font-size: 0.8em;
+.button-group {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    width: 100%;
+    max-width: 900px;
+    padding: 0 20px;
 }
 
 .button {
-    width: 140px;
-    margin: 10px;
-    padding: 10px;
-    background-color: #000000;
-    color: rgba(255, 255, 255, 0.87);
-    border: 1px solid rgba(255, 255, 255, 0.87);
+    height: 45px;
+    background: #8d6e63; /* Marrón Café Suave */
+    border: 2px solid #f5f5dc; /* Borde Crema para resaltar */
+    border-radius: 0px;
+    color: #f5f5dc; /* Texto Crema consistente */
+    font-family: "Press Start 2P", cursive;
+    font-size: 8px;
     cursor: pointer;
-    transition: all 0.3s;
+    box-shadow: 4px 4px 0 #2d1b18; /* Sombra Nogal Profundo */
+    text-transform: uppercase;
+    transition: all 0.1s;
+}
 
-    &:hover {
-        border: 1px solid #0ec3c9;
-        color: #0ec3c9;
+.button:active {
+    transform: translateY(2px);
+    box-shadow: none;
+}
+
+.restart {
+    background: #ff4d4d;
+    box-shadow: 4px 4px 0 #b33636;
+}
+
+/* --- RESPONSIVE LOGIC (RESTAURADA) --- */
+
+@media (min-width: 901px) {
+    .stats-layer {
+        order: 1;
     }
-
-    &:active {
-        background-color: #0ec3c9;
+    .game-layer {
+        order: 2;
     }
+    .controls-layer {
+        order: 3;
+    }
+}
 
-    /* Disabled styles */
-    &:disabled {
-        cursor: not-allowed;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: rgba(255, 255, 255, 0.3);
+@media (max-width: 900px) {
+    .game-layer {
+        order: 1;
+        flex: 1;
+    }
+    .stats-layer {
+        order: 2;
+        height: auto;
+        grid-template-columns: 1fr 1fr;
+        padding: 15px;
+        border-bottom: none;
+    }
+    .controls-layer {
+        order: 3;
+        height: auto;
+        padding-bottom: 20px;
+    }
+    .button-group {
+        grid-template-columns: 1fr 1fr;
     }
 }

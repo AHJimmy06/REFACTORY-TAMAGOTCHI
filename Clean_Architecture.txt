@@ -1,0 +1,33 @@
+REFACTORIZACIÓN CLEAN ARCHITECTURE - PROYECTO TAMAGOTCHI
+
+Este documento detalla la reestructuración del proyecto siguiendo los principios de Arquitectura Limpia de Robert C. Martin.
+
+1. La Regla de Dependencia
+--------------------------
+ANTES: 
+- El código estaba mezclado ('Spaghetti Code'). React llamaba a Phaser, Phaser leía el estado, el estado estaba en un componente. Las dependencias iban en todas direcciones.
+DESPUÉS: 
+- Las dependencias solo apuntan hacia ADENTRO. El Core (Entidades y Casos de Uso) no conoce a React ni a Phaser. El Core es el corazón estable de la aplicación.
+
+2. Las Capas de la Aplicación
+-----------------------------
+- ENTITIES (Capa Interna): 'Pet.js'. Contiene las reglas de negocio más generales. No depende de nada externo.
+- USE CASES: 'FeedPetUseCase.js', 'TickPetUseCase.js', etc. Orquestan el flujo de datos hacia y desde las entidades.
+- ADAPTERS: 'PetController.js' y el 'EventBus'. Traducen las acciones del usuario (clicks en React) en comandos que el Core entiende.
+- INFRASTRUCTURE (Capa Externa): 'LocalStoragePetRepository', 'PhaserGame.jsx', Escenas de Phaser. Son detalles de implementación que pueden ser reemplazados sin afectar la lógica del gato.
+
+3. Independencia de Frameworks
+------------------------------
+ANTES: 
+- Si querías cambiar Phaser por otro motor, tenías que reescribir casi todo el proyecto.
+DESPUÉS: 
+- El motor de juego es un "detalle". Si mañana decidimos usar Three.js, el Core y los Use Cases permanecen intactos. Solo habría que crear un nuevo adaptador visual.
+
+4. UI Responsiva y Desacoplada
+------------------------------
+- Separamos la UI en tres vistas independientes (Stats, Game, Controls). 
+- Gracias a la arquitectura de capas, pudimos implementar un diseño que reordena estas vistas según el dispositivo (Mobile vs Desktop) sin tocar ni una línea de la lógica del gato.
+
+CONCLUSIÓN FINAL:
+-----------------
+Clean Architecture nos permitió separar "lo que el sistema hace" (reglas del gato) de "cómo el sistema se muestra" (Phaser/React). Esta separación garantiza que el núcleo de nuestra aplicación sea inmune a los cambios de tecnología externa, facilitando la evolución del proyecto y asegurando una base de código profesional, organizada y escalable.
