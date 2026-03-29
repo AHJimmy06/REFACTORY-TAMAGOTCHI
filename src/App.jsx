@@ -1,216 +1,81 @@
-import React, { useEffect, useRef, useState } from "react";
-
+import React, { useEffect, useState, useRef } from "react";
 import StatusBar from "./components/StatusBar";
 import { PhaserGame } from "./game/PhaserGame";
-import { PetStatus } from "./utils/PetStatus";
+import { petController } from "./adapters/PetController";
+import { EventBus } from "./game/EventBus";
 
 function App() {
-    // The sprite can only be moved in the MainMenu Scene
-    const [currentScene, setCurrentScene] = useState("");
-
-    const [petStatus, setPetStatus] = useState(
-        new PetStatus(100, 100, 100, 100)
-    );
-
-    //  References to the PhaserGame component (game and scene are exposed)
+    const [stats, setStats] = useState(petController.getInitialState().stats);
+    const [isAlive, setIsAlive] = useState(petController.getInitialState().isAlive);
+    const [currentSceneKey, setCurrentSceneKey] = useState("");
     const phaserRef = useRef();
-    let statusPet = localStorage.getItem("statusPet");
 
     useEffect(() => {
-        if (statusPet) {
-            const status = JSON.parse(statusPet);
-            setPetStatus(
-                new PetStatus(
-                    status.health,
-                    status.food,
-                    status.energy,
-                    status.happiness
-                )
-            );
-        }
+        const handleUpdate = (newStats) => setStats({ ...newStats });
+        const handleDeath = () => {
+            setIsAlive(false);
+            phaserRef.current?.game?.scene.start("GameOver");
+        };
+        const handleReset = () => {
+            const initialState = petController.getInitialState();
+            setStats(initialState.stats);
+            setIsAlive(initialState.isAlive);
+        };
+
+        EventBus.on("pet-updated", handleUpdate);
+        EventBus.on("pet-died", handleDeath);
+        EventBus.on("pet-reset", handleReset);
+
+        return () => {
+            EventBus.off("pet-updated", handleUpdate);
+            EventBus.off("pet-died", handleDeath);
+            EventBus.off("pet-reset", handleReset);
+        };
     }, []);
 
     useEffect(() => {
-        const sceneKey = currentScene?.scene?.key;
-        if (sceneKey === "Game") {
-            const interval = setInterval(() => {
-                petStatus.reduceFood(3);
-                const scene = phaserRef.current.scene;
-                const currentAnim =
-                    phaserRef.current.scene.cat.anims.currentAnim.key;
-                if (currentAnim !== "cat-sleep") {
-                    petStatus.reduceEnergy(10);
-                } else {
-                    petStatus.increaseEnergy(20);
-                    console.log(petStatus.energy, "Energía");
-                    if (petStatus.energy < 100) {
-                        petStatus.increaseEnergy(20);
-                    }
-                    if (petStatus.energy >= 100) {
-                        console.log("Despertando");
-                        scene.handleAction("wake");
-                    }
-                }
-                petStatus.reduceHappiness(1);
-
-                setPetStatus(
-                    new PetStatus(
-                        petStatus.health,
-                        petStatus.food,
-                        petStatus.energy,
-                        petStatus.happiness
-                    )
-                );
-
-                localStorage.setItem("statusPet", JSON.stringify(petStatus));
-            }, 1000); // Cada segundo
-            console.log(petStatus);
-            if (petStatus.health === 0) {
-                const game = phaserRef.current.game;
-                if (game) {
-                    game.scene.start("GameOver");
-                }
-                localStorage.clear();
-            }
-            return () => clearInterval(interval); // Limpiar el intervalo al desmontar
+        if (currentSceneKey === "Game" && isAlive) {
+            const interval = setInterval(() => petController.tick(), 1000);
+            return () => clearInterval(interval);
         }
-    }, [petStatus, currentScene]);
+    }, [currentSceneKey, isAlive]);
 
-    const catEating = () => {
-        const scene = phaserRef.current.scene;
-
-        if (scene) {
-            scene.handleAction("eat");
-            console.log("Alimentando");
-
-            petStatus.increaseFood(30);
-        }
-    };
-
-    const catSleeping = () => {
-        const scene = phaserRef.current.scene;
-
-        if (scene) {
-            scene.handleAction("sleep");
-            console.log("Durmiendo");
-        }
-    };
-
-    const catPlaying = () => {
-        const scene = phaserRef.current.scene;
-
-        if (scene) {
-            scene.handleAction("play");
-            console.log("Jugando");
-            petStatus.reduceEnergy(10);
-            petStatus.increaseHealth(10); // Incrementar salud
-            petStatus.increaseHappiness(20); // Incrementar felicidad
-        }
-    };
-
-    const catPooping = () => {
-        const scene = phaserRef.current.scene;
-
-        if (scene) {
-            scene.handleAction("poop");
-            console.log("Haciendo popo");
-            petStatus.increaseHealth(5); // Incrementar salud
-            petStatus.reduceFood(10); // Reducir comida
-        }
-    };
-
-    // Event emitted from the PhaserGame component
     const handleCurrentScene = (scene) => {
-        setCurrentScene(scene);
+        const key = scene?.scene?.key || scene?.key || "";
+        setCurrentSceneKey(key);
     };
 
     return (
-        <div id="app">
-            <PhaserGame
-                ref={phaserRef}
-                currentActiveScene={handleCurrentScene}
-            />
-            <div>
-                {/* <div>
-                    <button className="button" onClick={changeScene}>
-                        Jugar
-                    </button>
-                </div> */}
-                {/* <div>
-                    <button
-                        disabled={canMoveSprite}
-                        className="button"
-                        onClick={moveSprite}
-                    >
-                        Toggle Movement
-                    </button>
-                </div> */}
-                {/* <div className="spritePosition">
-                    Sprite Position:
-                    <pre>{`{\n  x: ${spritePosition.x}\n  y: ${spritePosition.y}\n}`}</pre>
-                </div> */}
-                {/* <div>
-                    <button className="button" onClick={addSprite}>
-                        Add New Sprite
-                    </button>
-                </div> */}
-                {currentScene?.scene?.key === "Game" && (
-                    <React.Fragment>
-                        <div style={{ marginTop: "20px", marginLeft: "10px" }}>
-                            <StatusBar
-                                label="Salud"
-                                icon="assets/icons/heart.png"
-                                // value={health}
-                                value={petStatus.health}
-                                color="#00ff00"
-                            />
-                            <StatusBar
-                                label="Comida"
-                                icon="assets/icons/naruto.png"
-                                // value={food}
-                                value={petStatus.food}
-                                color="#ff7203"
-                            />
-                            <StatusBar
-                                label="Energía"
-                                icon="assets/icons/flash.png"
-                                // value={energy}
-                                value={petStatus.energy}
-                                color="#0000ff"
-                            />
-                            <StatusBar
-                                label="Felicidad"
-                                icon="assets/icons/happy.png"
-                                value={petStatus.happiness}
-                                color="#ffff00"
-                            />
-                        </div>
-                        <div>
-                            <button className="button" onClick={catEating}>
-                                Alimentar
-                            </button>
-                        </div>
-                        <div>
-                            <button className="button" onClick={catSleeping}>
-                                Dormir
-                            </button>
-                        </div>
-                        <div>
-                            <button className="button" onClick={catPlaying}>
-                                Jugar
-                            </button>
-                        </div>
-                        <div>
-                            <button className="button" onClick={catPooping}>
-                                Hacer popo
-                            </button>
-                        </div>
-                    </React.Fragment>
-                )}
+        <div id="app" className={currentSceneKey === "Game" ? "playing" : "in-menu"}>
+            
+            {/* VISTA 1: STATS - Solo si está vivo y en Game */}
+            {currentSceneKey === "Game" && isAlive && (
+                <div className="stats-layer">
+                    <StatusBar label="Salud" icon="assets/icons/heart.png" value={stats.health} color="#ff4d4d" />
+                    <StatusBar label="Comida" icon="assets/icons/naruto.png" value={stats.food} color="#ffa64d" />
+                    <StatusBar label="Energía" icon="assets/icons/flash.png" value={stats.energy} color="#4d94ff" />
+                    <StatusBar label="Felicidad" icon="assets/icons/happy.png" value={stats.happiness} color="#ffff4d" />
+                </div>
+            )}
+
+            {/* VISTA 2: GAME CONTAINER */}
+            <div className="game-layer">
+                <PhaserGame ref={phaserRef} currentActiveScene={handleCurrentScene} />
             </div>
+
+            {/* VISTA 3: CONTROLES - Solo si está vivo y en Game */}
+            {currentSceneKey === "Game" && isAlive && (
+                <div className="controls-layer">
+                    <div className="button-group">
+                        <button className="button" onClick={() => petController.feed()}>Alimentar</button>
+                        <button className="button" onClick={() => petController.sleep()}>Dormir</button>
+                        <button className="button" onClick={() => petController.play()}>Jugar</button>
+                        <button className="button" onClick={() => petController.poop()}>Popo</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
 
 export default App;
-

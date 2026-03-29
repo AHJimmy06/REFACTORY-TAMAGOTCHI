@@ -13,25 +13,27 @@ function StatusBar({ label, icon, value, color }) {
             style={{
                 display: "flex",
                 alignItems: "center",
-                marginBottom: "10px",
+                marginBottom: "5px",
             }}
         >
             <img
                 src={icon}
                 alt={label}
-                style={{ width: "32px", height: "32px", marginRight: "10px" }}
+                style={{ width: "24px", height: "24px", marginRight: "10px", imageRendering: "pixelated" }}
             />
             <div
                 style={{
                     flex: 1,
-                    background: "#ccc",
-                    height: "20px",
-                    borderRadius: "5px",
+                    background: "#2D1B18", /* Nogal Profundo */
+                    height: "16px",
+                    border: "2px solid #F5F5DC", /* Borde Crema */
+                    padding: "2px",
+                    boxSizing: "content-box"
                 }}
             >
-                <div style={{ ...barStyle, borderRadius: "5px" }}></div>
+                <div style={barStyle}></div>
             </div>
-            <span style={{ marginLeft: "10px" }}>{value}%</span>
+            <span style={{ marginLeft: "10px", fontSize: "10px", minWidth: "40px" }}>{value}%</span>
         </div>
     );
 }

@@ -7,7 +7,7 @@ import {
     PoopStrategy,
     SleepStrategy,
     WakeStrategy,
-} from "../../utils/CatActionStrategy";
+} from "../../infrastructure/phaser/CatActionStrategy";
 
 export class Game extends Scene {
     constructor() {
@@ -15,108 +15,70 @@ export class Game extends Scene {
         this.energyTimer = null;
     }
 
-    preload() {
-        this.load.image("room", "assets/enviroment/room2.png");
-
-        this.load.audio("eat", "assets/sounds/eatCookie.mp3");
-        this.load.spritesheet("catEating", "assets/personaje/Eating.png", {
-            frameWidth: 32,
-            frameHeight: 32,
-        });
-        this.load.spritesheet("catIdle", "assets/personaje/Idle.png", {
-            frameWidth: 32,
-            frameHeight: 32,
-        });
-        this.load.spritesheet("catWake", "assets/personaje/Idle.png", {
-            frameWidth: 32,
-            frameHeight: 32,
-        });
-        this.load.spritesheet("catHappy", "assets/personaje/Excited.png", {
-            frameWidth: 32,
-            frameHeight: 32,
-        });
-        this.load.spritesheet("catSad", "assets/personaje/Sad.png", {
-            frameWidth: 32,
-            frameHeight: 32,
-        });
-        this.load.spritesheet("catPlay", "assets/personaje/Dance.png", {
-            frameWidth: 32,
-            frameHeight: 32,
-        });
-        this.load.spritesheet("catSleepy", "assets/personaje/Sleepy.png", {
-            frameWidth: 32,
-            frameHeight: 32,
-        });
-        this.load.spritesheet("catSleep", "assets/personaje/Sleep.png", {
-            frameWidth: 32,
-            frameHeight: 32,
-        });
-        this.load.spritesheet("catPooping", "assets/personaje/Box3.png", {
-            frameWidth: 32,
-            frameHeight: 32,
-        });
-    }
-
     create() {
-        createAnimations(this);
-        // this.cameras.main.setBackgroundColor(0x00ff00);
+        const centerX = this.cameras.main.centerX;
+        const centerY = this.cameras.main.centerY;
 
-        // this.add.image(512, 384, "cloud1").setAlpha(0.5);
-        this.add.image(0, -150, "room").setOrigin(0, 0).setScale(2);
+        createAnimations(this);
+        
+        // Centramos el fondo con origin 0.5
+        this.add.image(centerX, centerY, "room").setOrigin(0.5, 0.5);
 
         this.cat = this.add
-            .sprite(480, 32, "catIdle")
-            .setOrigin(0, 0)
-            .setScale(4)
-            .setPosition(480, 450);
+            .sprite(centerX, centerY + 100, "catIdle")
+            .setOrigin(0.5, 0.5)
+            .setScale(4);
 
-        
+        this.cat.anims.play("cat-idle", true);
 
-        // this.cat.on("animationcomplete", () => {
-        //     this.cat.anims.play("cat-idle", true);
-        // });
-
-        // this.add.text(512, 384, 'Make something fun!\nand share it with us:\nsupport@phaser.io', {
-        //     fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
-        //     stroke: '#000000', strokeThickness: 8,
-        //     align: 'center'
-        // }).setOrigin(0.5).setDepth(100);
-
-        // this.anims.addMix("animA", "animB", 200);
-
-        // mix idle and eat
+        // Mixes de animaciones
         this.anims.addMix("cat-idle", "cat-eat", 200);
         this.anims.addMix("cat-eat", "cat-idle", 200);
-
-        // mix idle and sleep
-        // this.anims.addMix("cat-idle", "cat-sleep", 200);
-        // this.anims.addMix("cat-sleepy", "cat-sleep", 200);
         this.anims.addMix("cat-sleep", "cat-idle", 200);
-
-        // mix idle and play
         this.anims.addMix("cat-idle", "cat-play", 200);
         this.anims.addMix("cat-play", "cat-idle", 200);
-
-        // mix idle and pooping
         this.anims.addMix("cat-idle", "cat-pooping", 200);
         this.anims.addMix("cat-pooping", "cat-idle", 200);
-
-        // this.anims.addMix("cat-sleep", "cat-wake", 200);
         this.anims.addMix("cat-wake", "cat-idle", 200);
 
+        // Suscribirse a acciones
+        EventBus.on("action-triggered", (action) => this.handleAction(action));
+        EventBus.on("pet-sleeping", () => this.handleAction("sleep"));
+        EventBus.on("pet-woke-up", () => this.handleAction("wake"));
+        EventBus.on("pet-reset", () => {
+            this.cat.setPosition(480, 450);
+            this.cat.anims.play("cat-idle", true);
+        });
+
         EventBus.emit("current-scene-ready", this);
+
+        // Escuchar cambios de tamaño para re-centrar
+        this.scale.on('resize', (gameSize) => {
+            const width = gameSize.width;
+            const height = gameSize.height;
+            this.cameras.main.setViewport(0, 0, width, height);
+            
+            const centerX = width / 2;
+            const centerY = height / 2;
+            
+            // Reposicionar fondo y gato
+            this.children.list.forEach(child => {
+                if (child.texture && child.texture.key === 'room') {
+                    child.setPosition(centerX, centerY);
+                }
+            });
+            this.cat.setPosition(centerX, centerY + 100);
+        });
     }
 
     update() {
-        this.cat.anims.play("cat-idle", true);
-        if (this.cat.anims.currentAnim.key === "cat-sleep") {
-            console.log(this.cat.anims.currentAnim.key, "=====")
+        // La animación base es controlada por eventos o por el fin de animaciones previas
+        if (!this.cat.anims.isPlaying) {
             this.cat.anims.play("cat-idle", true);
         }
     }
 
     handleAction(action) {
-        // Cambiar la estrategia según la acción
         switch (action) {
             case "eat":
                 this.catAction = new EatStrategy(this.cat);
@@ -134,11 +96,16 @@ export class Game extends Scene {
                 this.catAction = new PoopStrategy(this.cat);
                 break;
             default:
-                console.log("Acción no reconocida");
                 return;
         }
-        // Ejecutar la acción
         this.catAction.execute();
+        
+        // Volver a idle después de ciertas animaciones
+        if (action !== "sleep") {
+            this.cat.once("animationcomplete", () => {
+                this.cat.anims.play("cat-idle", true);
+            });
+        }
     }
 
     // handleEat() {
