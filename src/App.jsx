@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import StatusBar from "./components/StatusBar";
 import { PhaserGame } from "./game/PhaserGame";
 import { petController } from "./adapters/PetController";
@@ -6,7 +6,9 @@ import { EventBus } from "./game/EventBus";
 
 function App() {
     const [stats, setStats] = useState(petController.getInitialState().stats);
-    const [isAlive, setIsAlive] = useState(petController.getInitialState().isAlive);
+    const [isAlive, setIsAlive] = useState(
+        petController.getInitialState().isAlive,
+    );
     const [currentSceneKey, setCurrentSceneKey] = useState("");
     const phaserRef = useRef();
 
@@ -46,31 +48,76 @@ function App() {
     };
 
     return (
-        <div id="app" className={currentSceneKey === "Game" ? "playing" : "in-menu"}>
-            
+        <div
+            id="app"
+            className={currentSceneKey === "Game" ? "playing" : "in-menu"}
+        >
             {/* VISTA 1: STATS - Solo si está vivo y en Game */}
             {currentSceneKey === "Game" && isAlive && (
                 <div className="stats-layer">
-                    <StatusBar label="Salud" icon="assets/icons/heart.png" value={stats.health} color="#ff4d4d" />
-                    <StatusBar label="Comida" icon="assets/icons/naruto.png" value={stats.food} color="#ffa64d" />
-                    <StatusBar label="Energía" icon="assets/icons/flash.png" value={stats.energy} color="#4d94ff" />
-                    <StatusBar label="Felicidad" icon="assets/icons/happy.png" value={stats.happiness} color="#ffff4d" />
+                    <StatusBar
+                        label="Salud"
+                        icon="assets/icons/heart.png"
+                        value={stats.health}
+                        color="#ff4d4d"
+                    />
+                    <StatusBar
+                        label="Comida"
+                        icon="assets/icons/naruto.png"
+                        value={stats.food}
+                        color="#ffa64d"
+                    />
+                    <StatusBar
+                        label="Energía"
+                        icon="assets/icons/flash.png"
+                        value={stats.energy}
+                        color="#4d94ff"
+                    />
+                    <StatusBar
+                        label="Felicidad"
+                        icon="assets/icons/happy.png"
+                        value={stats.happiness}
+                        color="#ffff4d"
+                    />
                 </div>
             )}
 
             {/* VISTA 2: GAME CONTAINER */}
             <div className="game-layer">
-                <PhaserGame ref={phaserRef} currentActiveScene={handleCurrentScene} />
+                <PhaserGame
+                    ref={phaserRef}
+                    currentActiveScene={handleCurrentScene}
+                />
             </div>
 
             {/* VISTA 3: CONTROLES - Solo si está vivo y en Game */}
             {currentSceneKey === "Game" && isAlive && (
                 <div className="controls-layer">
                     <div className="button-group">
-                        <button className="button" onClick={() => petController.feed()}>Alimentar</button>
-                        <button className="button" onClick={() => petController.sleep()}>Dormir</button>
-                        <button className="button" onClick={() => petController.play()}>Jugar</button>
-                        <button className="button" onClick={() => petController.poop()}>Popo</button>
+                        <button
+                            className="button"
+                            onClick={() => petController.feed()}
+                        >
+                            Alimentar
+                        </button>
+                        <button
+                            className="button"
+                            onClick={() => petController.sleep()}
+                        >
+                            Dormir
+                        </button>
+                        <button
+                            className="button"
+                            onClick={() => petController.play()}
+                        >
+                            Jugar
+                        </button>
+                        <button
+                            className="button"
+                            onClick={() => petController.poop()}
+                        >
+                            Popo
+                        </button>
                     </div>
                 </div>
             )}
